@@ -1,0 +1,36 @@
+GROK_LINE="Using standard Grok"
+
+grokit () {
+    local grok_load () {
+        local grokrc="${1}/.grokrc"
+        if [ -f $grokrc ]; then
+            source $grokrc
+        fi
+
+        local grokdir="${1}/.grok"
+        if [ -d $grokdir ]; then
+            local filename
+            for filename in ${grokdir}/*.sh; do
+                if [ -f $filename ]; then
+                    source $filename
+                fi
+            done
+        fi
+    }
+
+    grok_load /
+
+    local dirs=($(echo "$PWD" | tr '/' '\n'))
+    local base_dir=""
+    local dir
+    for dir in "${dirs[@]}"; do
+        base_dir+="/${dir}"
+        grok_load $base_dir
+    done
+}
+
+grokit
+
+if [ ! -z $GROK_LINE ]; then
+    echo $GROK_LINE
+fi
